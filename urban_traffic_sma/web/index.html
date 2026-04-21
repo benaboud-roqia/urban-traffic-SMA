@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🚦 SMA — Trafic Urbain</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <span class="logo">🚦</span>
+    <div>
+      <h1>Système Multi-Agents — Trafic Urbain</h1>
+      <p>15 agents actifs · SPADE simulation</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="ws-status" id="wsStatus">
+      <span class="dot disconnected"></span> Déconnecté
+    </div>
+    <div class="clock" id="clock">00:00:00</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══ COLONNE GAUCHE ══ -->
+  <div class="col-left">
+
+    <!-- Feux -->
+    <div class="card">
+      <div class="card-title">🚦 Feux de Signalisation</div>
+      <div id="lights-container">
+        <div class="light-row">
+          <div class="light-label">Intersection A</div>
+          <div class="traffic-light">
+            <div class="bulb red active" id="bulb-A-red"></div>
+            <div class="bulb green"      id="bulb-A-green"></div>
+          </div>
+          <span class="badge red" id="badge-A">RED</span>
+          <span class="light-detail" id="detail-A">0 véh · 10s</span>
+          <div style="width:100%">
+            <div class="light-prog-wrap"><div class="light-prog" id="prog-A" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="light-row">
+          <div class="light-label">Intersection B</div>
+          <div class="traffic-light">
+            <div class="bulb red active" id="bulb-B-red"></div>
+            <div class="bulb green"      id="bulb-B-green"></div>
+          </div>
+          <span class="badge red" id="badge-B">RED</span>
+          <span class="light-detail" id="detail-B">0 véh · 10s</span>
+          <div style="width:100%">
+            <div class="light-prog-wrap"><div class="light-prog" id="prog-B" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="light-row">
+          <div class="light-label">Intersection C</div>
+          <div class="traffic-light">
+            <div class="bulb red active" id="bulb-C-red"></div>
+            <div class="bulb green"      id="bulb-C-green"></div>
+          </div>
+          <span class="badge red" id="badge-C">RED</span>
+          <span class="light-detail" id="detail-C">0 véh · 10s</span>
+          <div style="width:100%">
+            <div class="light-prog-wrap"><div class="light-prog" id="prog-C" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Météo -->
+    <div class="card">
+      <div class="card-title">🌦️ Conditions Météo</div>
+      <div class="weather-box">
+        <div class="weather-icon" id="weatherIcon">☀️</div>
+        <div class="weather-info">
+          <div class="weather-name" id="weatherName">NORMAL</div>
+          <div class="weather-factor">Facteur vitesse : <strong id="weatherFactor">1.0</strong></div>
+        </div>
+        <div class="weather-bar-wrap">
+          <div class="weather-bar" id="weatherBar" style="width:100%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contrôleur -->
+    <div class="card">
+      <div class="card-title">🧠 Contrôleur Central</div>
+      <div class="ctrl-grid">
+        <div class="ctrl-item">
+          <div class="ctrl-val" id="ctrlWaiting">0</div>
+          <div class="ctrl-lbl">En attente</div>
+        </div>
+        <div class="ctrl-item">
+          <div class="ctrl-val accent" id="ctrlOptim">0</div>
+          <div class="ctrl-lbl">Optimisations</div>
+        </div>
+      </div>
+      <div class="ctrl-log" id="ctrlLog">En attente de données...</div>
+    </div>
+
+    <!-- Urgences -->
+    <div class="card">
+      <div class="card-title">🚨 Véhicules Prioritaires</div>
+      <div class="emerg-row" id="emerg-amb1">
+        <div class="emerg-icon">🚑</div>
+        <div class="emerg-info">
+          <div class="emerg-name">AMBULANCE amb1</div>
+          <div class="emerg-status inactive" id="emerg-status-amb1">💤 INACTIF</div>
+        </div>
+        <div class="emerg-pos" id="emerg-pos-amb1">—</div>
+      </div>
+      <div class="emerg-row" id="emerg-pol1">
+        <div class="emerg-icon">🚓</div>
+        <div class="emerg-info">
+          <div class="emerg-name">POLICE pol1</div>
+          <div class="emerg-status inactive" id="emerg-status-pol1">💤 INACTIF</div>
+        </div>
+        <div class="emerg-pos" id="emerg-pos-pol1">—</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ COLONNE CENTRE — SIMULATION MANUELLE ══ -->
+  <div class="col-center">
+
+    <!-- Carte intersection -->
+    <div class="sim-card">
+      <div class="sim-title">⚙️ Simulation Manuelle — Contrôle en Temps Réel</div>
+
+      <!-- Carte visuelle -->
+      <div class="intersection-map" id="intersectionMap">
+        <div class="road-h"></div>
+        <div class="road-v"></div>
+        <div class="road-mark-h"></div>
+        <div class="road-mark-v"></div>
+
+        <!-- Feu A — centre -->
+        <div class="map-light" style="left:52%;top:52%;transform:translate(-50%,-50%)" id="mapLight-A">
+          <div class="map-light-box">
+            <div class="map-bulb r on" id="mBulb-A-r"></div>
+            <div class="map-bulb g"    id="mBulb-A-g"></div>
+          </div>
+          <div class="map-light-label">A</div>
+        </div>
+
+        <!-- Feu B — gauche -->
+        <div class="map-light" style="left:14%;top:52%;transform:translate(-50%,-50%)" id="mapLight-B">
+          <div class="map-light-box">
+            <div class="map-bulb r on" id="mBulb-B-r"></div>
+            <div class="map-bulb g"    id="mBulb-B-g"></div>
+          </div>
+          <div class="map-light-label">B</div>
+        </div>
+
+        <!-- Feu C — haut -->
+        <div class="map-light" style="left:52%;top:14%;transform:translate(-50%,-50%)" id="mapLight-C">
+          <div class="map-light-box">
+            <div class="map-bulb r on" id="mBulb-C-r"></div>
+            <div class="map-bulb g"    id="mBulb-C-g"></div>
+          </div>
+          <div class="map-light-label">C</div>
+        </div>
+
+        <!-- Véhicules (positionnés par JS) -->
+        <div id="mapVehicles"></div>
+      </div>
+
+      <!-- Sélecteur intersection -->
+      <div class="sim-section-label">Intersection cible</div>
+      <div class="inter-select" style="margin-bottom:12px">
+        <div class="inter-btn selected" id="iBtn-A" onclick="selectInter('A')">A</div>
+        <div class="inter-btn"          id="iBtn-B" onclick="selectInter('B')">B</div>
+        <div class="inter-btn"          id="iBtn-C" onclick="selectInter('C')">C</div>
+      </div>
+
+      <div class="sim-controls">
+
+        <!-- Feux -->
+        <div class="sim-section-label">🚦 Contrôle des feux</div>
+        <div class="btn-group">
+          <button class="btn btn-green"  onclick="manualCmd('force_green')">🟢 Forcer VERT</button>
+          <button class="btn btn-red"    onclick="manualCmd('force_red')">🔴 Forcer ROUGE</button>
+          <button class="btn btn-gray"   onclick="manualCmd('auto')">🔄 Mode Auto</button>
+        </div>
+
+        <div class="sim-divider"></div>
+
+        <!-- Urgences -->
+        <div class="sim-section-label">🚨 Déclencher urgence</div>
+        <div class="btn-group">
+          <button class="btn btn-orange" onclick="manualCmd('emergency_amb')">🚑 Ambulance</button>
+          <button class="btn btn-orange" onclick="manualCmd('emergency_pol')">🚓 Police</button>
+        </div>
+
+        <div class="sim-divider"></div>
+
+        <!-- Météo -->
+        <div class="sim-section-label">🌦️ Changer météo</div>
+        <div class="btn-group">
+          <button class="btn btn-blue"   onclick="setWeather('NORMAL')">☀️ Normal</button>
+          <button class="btn btn-blue"   onclick="setWeather('PLUIE')">🌧️ Pluie</button>
+          <button class="btn btn-blue"   onclick="setWeather('BROUILLARD')">🌫️ Brouillard</button>
+          <button class="btn btn-blue"   onclick="setWeather('NEIGE')">❄️ Neige</button>
+          <button class="btn btn-blue"   onclick="setWeather('VERGLAS')">🧊 Verglas</button>
+        </div>
+
+        <div class="sim-divider"></div>
+
+        <!-- Véhicules -->
+        <div class="sim-section-label">🚗 Ajouter véhicule</div>
+        <div class="btn-group">
+          <button class="btn btn-purple" onclick="manualCmd('add_vehicle')">➕ Ajouter</button>
+          <button class="btn btn-gray"   onclick="manualCmd('clear_vehicles')">🗑️ Vider</button>
+        </div>
+
+        <div class="sim-divider"></div>
+
+        <!-- Parking -->
+        <div class="sim-section-label">🅿️ Parking</div>
+        <div class="btn-group">
+          <button class="btn btn-gray" onclick="manualCmd('park_full_P1')">P1 → PLEIN</button>
+          <button class="btn btn-gray" onclick="manualCmd('park_full_P2')">P2 → PLEIN</button>
+          <button class="btn btn-green" onclick="manualCmd('park_reset')">↺ Réinitialiser</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="card">
+      <div class="card-title">📊 Statistiques Globales</div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-val" id="statCycle">0</div><div class="stat-lbl">Cycle</div></div>
+        <div class="stat-box"><div class="stat-val" id="statWaiting">0</div><div class="stat-lbl">En attente</div></div>
+        <div class="stat-box"><div class="stat-val" id="statAvg">0s</div><div class="stat-lbl">Temps moy.</div></div>
+        <div class="stat-box"><div class="stat-val red-val" id="statEmerg">0</div><div class="stat-lbl">Urgences</div></div>
+        <div class="stat-box"><div class="stat-val green-val" id="statOptim">0</div><div class="stat-lbl">Optimisations</div></div>
+        <div class="stat-box"><div class="stat-val blue-val" id="statWeather">0</div><div class="stat-lbl">Alertes météo</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ COLONNE DROITE ══ -->
+  <div class="col-right">
+
+    <!-- Véhicules -->
+    <div class="card">
+      <div class="card-title">🚗 Véhicules (5 agents)</div>
+      <div id="vehicles-container"></div>
+    </div>
+
+    <!-- Parkings -->
+    <div class="card">
+      <div class="card-title">🅿️ Parkings</div>
+      <div class="park-row">
+        <div class="park-label">🅿️ P1 — Intersection A</div>
+        <div class="park-bar-wrap"><div class="park-bar" id="park-bar-P1" style="width:0%"></div></div>
+        <div class="park-info" id="park-info-P1">0/20 · DISPONIBLE</div>
+      </div>
+      <div class="park-row">
+        <div class="park-label">🅿️ P2 — Intersection B</div>
+        <div class="park-bar-wrap"><div class="park-bar" id="park-bar-P2" style="width:0%"></div></div>
+        <div class="park-info" id="park-info-P2">0/15 · DISPONIBLE</div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="card" style="flex:1">
+      <div class="card-title">
+        📋 Journal des Interactions
+        <button class="clear-btn" onclick="clearLog()">🗑️ Effacer</button>
+      </div>
+      <div class="log-box" id="logBox"></div>
+    </div>
+
+  </div>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
