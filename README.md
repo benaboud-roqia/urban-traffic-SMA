@@ -10,7 +10,7 @@
 | Nom | Prénom |
 |-----|--------|
 | BENABOUD | Roqia |
-| KOUACHKHIA | Dounia Zed |
+| KOUACHKHIA | Dounia Zed | https://github.com/douniaZD
 | MEHRAB | Roua |
 
 ---
@@ -152,6 +152,7 @@ python main.py
 ---
 
 ## 📸 Aperçu
+<img width="3442" height="1795" alt="image" src="https://github.com/user-attachments/assets/18a3ef80-6367-46be-8606-423d2b7182e0" />
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
